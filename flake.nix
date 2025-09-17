@@ -22,19 +22,10 @@
           version = "0.1.2";
 
           # Use pre-built binaries from GitHub releases
-          src =
-            if pkgs.stdenv.isDarwin && pkgs.stdenv.isAarch64 then
-              pkgs.fetchurl {
-                url = "https://github.com/zach-source/opx/releases/download/v${version}/opx-server_v${version}_darwin_arm64.tar.gz";
-                sha256 = "0000000000000000000000000000000000000000000000000000"; # TODO: Update
-              }
-            else if pkgs.stdenv.isDarwin && pkgs.stdenv.isx86_64 then
-              pkgs.fetchurl {
-                url = "https://github.com/zach-source/opx/releases/download/v${version}/opx-server_v${version}_darwin_amd64.tar.gz";
-                sha256 = "0000000000000000000000000000000000000000000000000000"; # TODO: Update
-              }
-            else
-              throw "opx is currently only supported on macOS";
+          src = pkgs.fetchurl {
+            url = "https://github.com/zach-source/opx/releases/download/v${version}/opx-server_v${version}_darwin_arm64.tar.gz";
+            sha256 = "sha256-Ns2+1TaC6NRxNTBpgFPZxeU1a8bEVrEgUfBTB4PYV1A=";
+          };
 
           # No build dependencies needed - using pre-built binaries
           nativeBuildInputs = [ pkgs.installShellFiles ];
@@ -42,7 +33,7 @@
           # Also download client binary
           clientSrc = pkgs.fetchurl {
             url = "https://github.com/zach-source/opx/releases/download/v${version}/opx-client_v${version}_darwin_arm64.tar.gz";
-            sha256 = "0000000000000000000000000000000000000000000000000000"; # TODO: Update
+            sha256 = "sha256-5SLGiiKYMgzmvSSaVm7aP91wR1Nibk2myLg=";
           };
 
           # Extract and install both binaries
