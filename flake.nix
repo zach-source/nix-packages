@@ -17,48 +17,60 @@
       let
         pkgs = nixpkgs.legacyPackages.${system};
 
-        opx = pkgs.buildGoModule rec {
+        opx = pkgs.stdenv.mkDerivation rec {
           pname = "opx";
           version = "0.1.2";
 
-          src = pkgs.fetchFromGitHub {
-            owner = "zach-source";
-            repo = "opx";
-            rev = "v${version}";
-            sha256 = "sha256-FJHxJEmRPJIMD49czF3XJ6qg+/b7SsPWuUsRza4L70g=";
+          # Use pre-built binaries from GitHub releases
+          src =
+            if pkgs.stdenv.isDarwin && pkgs.stdenv.isAarch64 then
+              pkgs.fetchurl {
+                url = "https://github.com/zach-source/opx/releases/download/v${version}/opx-server_v${version}_darwin_arm64.tar.gz";
+                sha256 = "0000000000000000000000000000000000000000000000000000"; # TODO: Update
+              }
+            else if pkgs.stdenv.isDarwin && pkgs.stdenv.isx86_64 then
+              pkgs.fetchurl {
+                url = "https://github.com/zach-source/opx/releases/download/v${version}/opx-server_v${version}_darwin_amd64.tar.gz";
+                sha256 = "0000000000000000000000000000000000000000000000000000"; # TODO: Update
+              }
+            else
+              throw "opx is currently only supported on macOS";
+
+          # No build dependencies needed - using pre-built binaries
+          nativeBuildInputs = [ pkgs.installShellFiles ];
+
+          # Also download client binary
+          clientSrc = pkgs.fetchurl {
+            url = "https://github.com/zach-source/opx/releases/download/v${version}/opx-client_v${version}_darwin_arm64.tar.gz";
+            sha256 = "0000000000000000000000000000000000000000000000000000"; # TODO: Update
           };
 
-          vendorHash = null; # Update when dependencies are added
+          # Extract and install both binaries
+          unpackPhase = ''
+            runHook preUnpack
 
-          # Enable CGO for macOS Security framework integration
-          env.CGO_ENABLED = if pkgs.stdenv.isDarwin then "1" else "0";
+            # Extract server binary
+            tar -xzf $src
 
-          nativeBuildInputs =
-            with pkgs;
-            [
-              go
-            ]
-            ++ lib.optionals stdenv.isDarwin [
-              pkgs.darwin.apple_sdk.frameworks.Security
-              pkgs.darwin.apple_sdk.frameworks.CoreFoundation
-            ];
+            # Extract client binary  
+            mkdir -p client_tmp
+            tar -xzf $clientSrc -C client_tmp
+            mv client_tmp/opx .
 
-          # Build both binaries
-          subPackages = [
-            "cmd/opx-authd"
-            "cmd/opx"
-          ];
+            runHook postUnpack
+          '';
 
-          ldflags = [
-            "-s"
-            "-w"
-            "-X main.version=${version}"
-          ];
+          installPhase = ''
+            runHook preInstall
 
-          # Install both binaries
-          postInstall = ''
-            # Binaries are already installed by buildGoModule
-            echo "opx and opx-authd installed"
+            mkdir -p $out/bin
+            cp opx-authd $out/bin/opx-authd
+            cp opx $out/bin/opx
+
+            chmod +x $out/bin/opx-authd
+            chmod +x $out/bin/opx
+
+            runHook postInstall
           '';
 
           meta = with pkgs.lib; {
@@ -66,7 +78,7 @@
             homepage = "https://github.com/zach-source/opx";
             license = licenses.mit;
             maintainers = [ ];
-            platforms = platforms.darwin; # macOS only for now due to Security framework
+            platforms = platforms.darwin; # macOS only - uses pre-built binaries
           };
         };
 
