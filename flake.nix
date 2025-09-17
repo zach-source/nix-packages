@@ -25,13 +25,13 @@
             owner = "zach-source";
             repo = "opx";
             rev = "v${version}";
-            sha256 = "0000000000000000000000000000000000000000000000000000"; # TODO: Update
+            sha256 = "sha256-FJHxJEmRPJIMD49czF3XJ6qg+/b7SsPWuUsRza4L70g=";
           };
 
           vendorHash = null; # Update when dependencies are added
 
           # Enable CGO for macOS Security framework integration
-          CGO_ENABLED = if pkgs.stdenv.isDarwin then "1" else "0";
+          env.CGO_ENABLED = if pkgs.stdenv.isDarwin then "1" else "0";
 
           nativeBuildInputs =
             with pkgs;
@@ -39,8 +39,8 @@
               go
             ]
             ++ lib.optionals stdenv.isDarwin [
-              darwin.apple_sdk.frameworks.Security
-              darwin.apple_sdk.frameworks.CoreFoundation
+              pkgs.darwin.apple_sdk.frameworks.Security
+              pkgs.darwin.apple_sdk.frameworks.CoreFoundation
             ];
 
           # Build both binaries
@@ -86,8 +86,8 @@
               golangci-lint
             ]
             ++ lib.optionals stdenv.isDarwin [
-              darwin.apple_sdk.frameworks.Security
-              darwin.apple_sdk.frameworks.CoreFoundation
+              pkgs.darwin.apple_sdk.frameworks.Security
+              pkgs.darwin.apple_sdk.frameworks.CoreFoundation
             ];
 
           shellHook = ''
