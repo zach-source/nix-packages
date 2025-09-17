@@ -30,39 +30,44 @@
           # No build dependencies needed - using pre-built binaries
           nativeBuildInputs = [ pkgs.installShellFiles ];
 
-          # Also download client binary
-          clientSrc = pkgs.fetchurl {
-            url = "https://github.com/zach-source/opx/releases/download/v${version}/opx-client_v${version}_darwin_arm64.tar.gz";
-            sha256 = "sha256-5SLGiiKYMgzmvSSaVm7aP91wR1Nibk2myLg=";
-          };
-
-          # Extract and install both binaries
+          # Custom unpack since archives contain files at root level
           unpackPhase = ''
             runHook preUnpack
+
+            # Create a workspace directory
+            mkdir -p source
+            cd source
 
             # Extract server binary
             tar -xzf $src
 
-            # Extract client binary  
-            mkdir -p client_tmp
-            tar -xzf $clientSrc -C client_tmp
-            mv client_tmp/opx .
-
             runHook postUnpack
           '';
 
-          installPhase = ''
-            runHook preInstall
+          installPhase =
+            let
+              clientSrc = pkgs.fetchurl {
+                url = "https://github.com/zach-source/opx/releases/download/v${version}/opx-client_v${version}_darwin_arm64.tar.gz";
+                sha256 = "e522c68a2298320ce6bd249a566eda3fdd70475ca0efd3d18f53626e4da6c8b8";
+              };
+            in
+            ''
+              runHook preInstall
 
-            mkdir -p $out/bin
-            cp opx-authd $out/bin/opx-authd
-            cp opx $out/bin/opx
+              mkdir -p $out/bin
 
-            chmod +x $out/bin/opx-authd
-            chmod +x $out/bin/opx
+              # Install server binary (already extracted from src)
+              cp opx-authd $out/bin/opx-authd
+              chmod +x $out/bin/opx-authd
 
-            runHook postInstall
-          '';
+              # Extract and install client binary
+              mkdir -p client_tmp
+              tar -xzf ${clientSrc} -C client_tmp
+              cp client_tmp/opx $out/bin/opx
+              chmod +x $out/bin/opx
+
+              runHook postInstall
+            '';
 
           meta = with pkgs.lib; {
             description = "Multi-backend secret batching daemon with advanced security";
