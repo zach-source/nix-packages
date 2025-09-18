@@ -104,10 +104,12 @@
           '';
         };
 
-        # Home Manager module will be added here
-        homeManagerModules = {
-          opx = ./modules/opx.nix;
-        };
       }
-    );
+    )
+    // {
+      # Home Manager modules (system-agnostic)
+      homeManagerModules = {
+        opx = ./modules/opx.nix;
+      };
+    };
 }
