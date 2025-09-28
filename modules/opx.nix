@@ -85,6 +85,17 @@ in
       description = "Environment file containing secrets (VAULT_TOKEN, etc.)";
     };
 
+    environment = mkOption {
+      type = types.attrsOf types.str;
+      default = { };
+      description = "Environment variables to pass to opx-authd daemon";
+      example = {
+        VAULT_ADDR = "https://vault.company.com";
+        VAULT_NAMESPACE = "admin";
+        OPX_SOCKET_PATH = "/tmp/custom.sock";
+      };
+    };
+
     policy = mkOption {
       type = types.nullOr configFormat.type;
       default = null;
@@ -115,19 +126,18 @@ in
     launchd.agents.opx-authd = mkIf pkgs.stdenv.isDarwin {
       enable = true;
       config = {
-        ProgramArguments =
-          [
-            "${cfg.package}/bin/opx-authd"
-            "--backend=${cfg.backend}"
-            "--session-timeout=${toString cfg.sessionTimeout}"
-            "--ttl=${toString cfg.ttl}"
-            "--audit-log-retention-days=${toString cfg.auditLogRetentionDays}"
-          ]
-          ++ optional cfg.enableSessionLock "--enable-session-lock"
-          ++ optional cfg.lockOnAuthFailure "--lock-on-auth-failure"
-          ++ optional cfg.enableAuditLog "--enable-audit-log"
-          ++ optional cfg.verbose "--verbose"
-          ++ cfg.extraArgs;
+        ProgramArguments = [
+          "${cfg.package}/bin/opx-authd"
+          "--backend=${cfg.backend}"
+          "--session-timeout=${toString cfg.sessionTimeout}"
+          "--ttl=${toString cfg.ttl}"
+          "--audit-log-retention-days=${toString cfg.auditLogRetentionDays}"
+        ]
+        ++ optional cfg.enableSessionLock "--enable-session-lock"
+        ++ optional cfg.lockOnAuthFailure "--lock-on-auth-failure"
+        ++ optional cfg.enableAuditLog "--enable-audit-log"
+        ++ optional cfg.verbose "--verbose"
+        ++ cfg.extraArgs;
 
         KeepAlive = true;
         RunAtLoad = true;
@@ -135,10 +145,12 @@ in
         StandardOutPath = "${config.home.homeDirectory}/.local/share/opx-authd/opx-authd.log";
         StandardErrorPath = "${config.home.homeDirectory}/.local/share/opx-authd/opx-authd.error.log";
 
-        EnvironmentVariables = mkIf (cfg.environmentFile != null) {
-          # Load environment from file
-          ENVIRONMENT_FILE = cfg.environmentFile;
-        };
+        EnvironmentVariables =
+          cfg.environment
+          // (mkIf (cfg.environmentFile != null) {
+            # Load environment from file
+            ENVIRONMENT_FILE = cfg.environmentFile;
+          });
       };
     };
 
@@ -166,6 +178,7 @@ in
         RestartSec = "5";
 
         EnvironmentFile = mkIf (cfg.environmentFile != null) cfg.environmentFile;
+        Environment = mapAttrsToList (name: value: "${name}=${value}") cfg.environment;
       };
 
       Install = {

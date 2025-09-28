@@ -27,7 +27,7 @@
             sha256 = "1af3b48a91fc02b9fe5e0bfaac847d70b5f9b565ad9b98c640ebd5c19cf8e950";
           };
 
-          # No build dependencies needed - using pre-built binaries
+          # Build dependencies
           nativeBuildInputs = [ pkgs.installShellFiles ];
 
           # Custom unpack since archives contain files at root level
