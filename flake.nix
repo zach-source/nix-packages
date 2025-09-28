@@ -19,11 +19,11 @@
 
         opx = pkgs.stdenv.mkDerivation rec {
           pname = "opx";
-          version = "0.5.0";
+          version = "0.6.0";
 
           # Use pre-built binaries from GitHub releases
           src = pkgs.fetchurl {
-            url = "https://github.com/zach-source/opx/releases/download/v${version}/opx-server_v${version}_darwin_arm64_signed.tar.gz";
+            url = "https://github.com/zach-source/opx/releases/download/v0.6.0/opx-server_v0.6.0_darwin_arm64_signed.tar.gz";
             sha256 = "52f5aab23becb352e96e56ad7ed2cbb96359c88193a6fe9e4663d0fa6c3b8790";
           };
 
@@ -47,7 +47,7 @@
           installPhase =
             let
               clientSrc = pkgs.fetchurl {
-                url = "https://github.com/zach-source/opx/releases/download/v${version}/opx-client_v${version}_darwin_arm64_signed.tar.gz";
+                url = "https://github.com/zach-source/opx/releases/download/v0.6.0/opx-client_v0.6.0_darwin_arm64_signed.tar.gz";
                 sha256 = "67964c7f4bb94ba269b0ebc26550401c0ad6a19a1e844b2eb6a0b283b57bdec4";
               };
             in
