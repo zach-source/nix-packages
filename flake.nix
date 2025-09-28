@@ -24,7 +24,7 @@
           # Use pre-built binaries from GitHub releases
           src = pkgs.fetchurl {
             url = "https://github.com/zach-source/opx/releases/download/v0.6.0/opx-server_v0.6.0_darwin_arm64_signed.tar.gz";
-            sha256 = "52f5aab23becb352e96e56ad7ed2cbb96359c88193a6fe9e4663d0fa6c3b8790";
+            sha256 = "1af3b48a91fc02b9fe5e0bfaac847d70b5f9b565ad9b98c640ebd5c19cf8e950";
           };
 
           # No build dependencies needed - using pre-built binaries
@@ -48,7 +48,7 @@
             let
               clientSrc = pkgs.fetchurl {
                 url = "https://github.com/zach-source/opx/releases/download/v0.6.0/opx-client_v0.6.0_darwin_arm64_signed.tar.gz";
-                sha256 = "67964c7f4bb94ba269b0ebc26550401c0ad6a19a1e844b2eb6a0b283b57bdec4";
+                sha256 = "9f1b87833e4274fccd1be9e74a3652ffbfff377efc98636b4fd30aad6b9de5ed";
               };
             in
             ''
