@@ -93,9 +93,45 @@ in
         VAULT_ADDR = "https://vault.company.com";
         VAULT_NAMESPACE = "admin";
         OPX_SOCKET_PATH = "/tmp/custom.sock";
-        OPX_OP_PATH = "/usr/local/bin/op";
-        OPX_VAULT_PATH = "/usr/local/bin/vault";
-        OPX_BAO_PATH = "/usr/local/bin/bao";
+      };
+    };
+
+    executablePaths = mkOption {
+      type = types.submodule {
+        options = {
+          op = mkOption {
+            type = types.nullOr types.str;
+            default = null;
+            description = "Custom path to 1Password CLI binary";
+            example = "/usr/local/bin/op";
+          };
+          vault = mkOption {
+            type = types.nullOr types.str;
+            default = null;
+            description = "Custom path to HashiCorp Vault CLI binary";
+            example = "/usr/local/bin/vault";
+          };
+          bao = mkOption {
+            type = types.nullOr types.str;
+            default = null;
+            description = "Custom path to OpenBao CLI binary";
+            example = "/usr/local/bin/bao";
+          };
+        };
+      };
+      default = { };
+      description = "Custom paths to external CLI binaries";
+    };
+
+    daemonConfig = mkOption {
+      type = configFormat.type;
+      default = { };
+      description = "Raw daemon configuration (advanced users)";
+      example = {
+        executable_paths = {
+          op = "/usr/local/bin/op";
+          vault = "/usr/local/bin/vault";
+        };
       };
     };
 
@@ -119,6 +155,28 @@ in
   config = mkIf cfg.enable {
     # Install the package
     home.packages = [ cfg.package ];
+
+    # Create daemon config file if executable paths are configured
+    xdg.configFile."opx-authd/daemon.json" =
+      mkIf
+        (
+          cfg.executablePaths.op != null
+          || cfg.executablePaths.vault != null
+          || cfg.executablePaths.bao != null
+          || cfg.daemonConfig != { }
+        )
+        {
+          source = configFormat.generate "daemon.json" (
+            cfg.daemonConfig
+            // {
+              executable_paths = filterAttrs (n: v: v != null) {
+                op = cfg.executablePaths.op;
+                vault = cfg.executablePaths.vault;
+                bao = cfg.executablePaths.bao;
+              };
+            }
+          );
+        };
 
     # Create policy file if specified
     xdg.configFile."opx-authd/policy.json" = mkIf (cfg.policy != null) {
