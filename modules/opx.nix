@@ -93,6 +93,9 @@ in
         VAULT_ADDR = "https://vault.company.com";
         VAULT_NAMESPACE = "admin";
         OPX_SOCKET_PATH = "/tmp/custom.sock";
+        OPX_OP_PATH = "/usr/local/bin/op";
+        OPX_VAULT_PATH = "/usr/local/bin/vault";
+        OPX_BAO_PATH = "/usr/local/bin/bao";
       };
     };
 
