@@ -80,7 +80,7 @@
 
         nixfleet = pkgs.stdenv.mkDerivation rec {
           pname = "nixfleet";
-          version = "0.1.2"; # nixfleet
+          version = "0.1.4"; # nixfleet
 
           src =
             let
@@ -89,25 +89,25 @@
                   if pkgs.stdenv.isAarch64 then
                     {
                       url = "https://github.com/zach-source/nix-fleet/releases/download/v${version}/nixfleet-darwin-arm64.tar.gz";
-                      sha256 = "03e86e7cbf64b130f95930b21167b68e6128306d0fe37c7828189beb79b204f5"; # darwin-arm64
+                      sha256 = "3f16119413816db1460999ad02fef2a1b6a786bc6ed218804da36d9e3b5ccc01"; # darwin-arm64
                       binaryName = "nixfleet-darwin-arm64";
                     }
                   else
                     {
                       url = "https://github.com/zach-source/nix-fleet/releases/download/v${version}/nixfleet-darwin-amd64.tar.gz";
-                      sha256 = "efe99874e1964a5fd0e31c1ca90132c65c85f5003f37e6a2e4938ff5a34ac341"; # darwin-amd64
+                      sha256 = "3bcdfd4c4805e97683e027db121b175d5dd0bd9ff6d32f65c2df1f7334d40a8d"; # darwin-amd64
                       binaryName = "nixfleet-darwin-amd64";
                     }
                 else if pkgs.stdenv.isAarch64 then
                   {
                     url = "https://github.com/zach-source/nix-fleet/releases/download/v${version}/nixfleet-linux-arm64.tar.gz";
-                    sha256 = "33ad5f546ab4452fd13562944ca885ea61499726e421547831e244681ccd42b4"; # linux-arm64
+                    sha256 = "06e834e29d7149191102e984d737fb0b38dce4a20788aa982b734972a5eda6d7"; # linux-arm64
                     binaryName = "nixfleet-linux-arm64";
                   }
                 else
                   {
                     url = "https://github.com/zach-source/nix-fleet/releases/download/v${version}/nixfleet-linux-amd64.tar.gz";
-                    sha256 = "494b6f9421e55a263a0ee37d8ba2af5d692bfa487a5c27a20b968af489c8ec39"; # linux-amd64
+                    sha256 = "22214e955a1b8b71633f5247853e05a1aceab19553f489bd35b55e5419ebf9d2"; # linux-amd64
                     binaryName = "nixfleet-linux-amd64";
                   };
             in
