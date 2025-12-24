@@ -1,0 +1,51 @@
+name: Update NixFleet Package
+
+on:
+  repository_dispatch:
+    types: [nixfleet-release]
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    name: Update Package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Update flake.nix
+        run: |
+          VERSION="${{ github.event.client_payload.version }}"
+          DARWIN_ARM64="${{ github.event.client_payload.darwin_arm64_sha256 }}"
+          DARWIN_AMD64="${{ github.event.client_payload.darwin_amd64_sha256 }}"
+          LINUX_ARM64="${{ github.event.client_payload.linux_arm64_sha256 }}"
+          LINUX_AMD64="${{ github.event.client_payload.linux_amd64_sha256 }}"
+
+          # Update version
+          sed -i "s/version = \"[0-9.]*\";  # nixfleet/version = \"${VERSION}\";  # nixfleet/" flake.nix
+
+          # Update SHA256 hashes - use unique markers for each platform
+          sed -i "s/sha256 = \"[a-f0-9]*\";  # darwin-arm64/sha256 = \"${DARWIN_ARM64}\";  # darwin-arm64/" flake.nix
+          sed -i "s/sha256 = \"[a-f0-9]*\";  # darwin-amd64/sha256 = \"${DARWIN_AMD64}\";  # darwin-amd64/" flake.nix
+          sed -i "s/sha256 = \"[a-f0-9]*\";  # linux-arm64/sha256 = \"${LINUX_ARM64}\";  # linux-arm64/" flake.nix
+          sed -i "s/sha256 = \"[a-f0-9]*\";  # linux-amd64/sha256 = \"${LINUX_AMD64}\";  # linux-amd64/" flake.nix
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v25
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+
+      - name: Verify build
+        run: |
+          nix build .#nixfleet
+          ./result/bin/nixfleet --version
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add flake.nix
+          git commit -m "Update nixfleet to v${{ github.event.client_payload.version }}"
+          git push
