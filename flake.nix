@@ -78,10 +78,80 @@
           };
         };
 
+        nixfleet = pkgs.stdenv.mkDerivation rec {
+          pname = "nixfleet";
+          version = "0.1.0";
+
+          src =
+            let
+              selectSystem =
+                if pkgs.stdenv.isDarwin then
+                  if pkgs.stdenv.isAarch64 then
+                    {
+                      url = "https://github.com/zach-source/nix-fleet/releases/download/v${version}/nixfleet-darwin-arm64.tar.gz";
+                      sha256 = "64476cc82186b520c3bee610150d266679eb51c51c9eee6b113525f24a1ba5f1";
+                      binaryName = "nixfleet-darwin-arm64";
+                    }
+                  else
+                    {
+                      url = "https://github.com/zach-source/nix-fleet/releases/download/v${version}/nixfleet-darwin-amd64.tar.gz";
+                      sha256 = "b052d9a9d50344efa94770cb6a3a3c03ecb3c0462bc2a21dbc786aab16dcb2bd";
+                      binaryName = "nixfleet-darwin-amd64";
+                    }
+                else if pkgs.stdenv.isAarch64 then
+                  {
+                    url = "https://github.com/zach-source/nix-fleet/releases/download/v${version}/nixfleet-linux-arm64.tar.gz";
+                    sha256 = "3f5d5900131bbb662774db48e0f9586aa1619806bfaedefb8193e75823f2da60";
+                    binaryName = "nixfleet-linux-arm64";
+                  }
+                else
+                  {
+                    url = "https://github.com/zach-source/nix-fleet/releases/download/v${version}/nixfleet-linux-amd64.tar.gz";
+                    sha256 = "c667f837ee7358895b523643d71e9fe73b71c7ac2d32723b4995a1ec302a6e7e";
+                    binaryName = "nixfleet-linux-amd64";
+                  };
+            in
+            pkgs.fetchurl {
+              inherit (selectSystem) url sha256;
+            };
+
+          binaryName =
+            if pkgs.stdenv.isDarwin then
+              if pkgs.stdenv.isAarch64 then "nixfleet-darwin-arm64" else "nixfleet-darwin-amd64"
+            else if pkgs.stdenv.isAarch64 then
+              "nixfleet-linux-arm64"
+            else
+              "nixfleet-linux-amd64";
+
+          unpackPhase = ''
+            runHook preUnpack
+            mkdir -p source
+            cd source
+            tar -xzf $src
+            runHook postUnpack
+          '';
+
+          installPhase = ''
+            runHook preInstall
+            mkdir -p $out/bin
+            cp ${binaryName} $out/bin/nixfleet
+            chmod +x $out/bin/nixfleet
+            runHook postInstall
+          '';
+
+          meta = with pkgs.lib; {
+            description = "Fleet management CLI for deploying Nix configurations to non-NixOS hosts";
+            homepage = "https://github.com/zach-source/nix-fleet";
+            license = licenses.mit;
+            maintainers = [ ];
+            platforms = platforms.unix;
+          };
+        };
+
       in
       {
         packages = {
-          inherit opx;
+          inherit opx nixfleet;
           default = opx;
         };
 
