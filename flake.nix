@@ -95,7 +95,7 @@
             let
               selectSystem =
                 if pkgs.stdenv.isDarwin then
-                  if pkgs.stdenv.isAArch64 then
+                  if pkgs.stdenv.isAarch64 then
                     {
                       url = "https://github.com/zach-source/claude-mon/releases/download/v${version}/claude-mon-darwin-arm64.tar.gz";
                       sha256 = "0000000000000000000000000000000000000000000000000000000000000000"; # darwin-arm64 # claude-mon
@@ -127,7 +127,7 @@
           binaryName =
             if pkgs.stdenv.isDarwin then
               if pkgs.stdenv.isAarch64 then "claude-mon-darwin-arm64" else "claude-mon-darwin-amd64"
-            else if pkgs.stdenv.isAArch64 then
+            else if pkgs.stdenv.isAarch64 then
               "claude-mon-linux-arm64"
             else
               "claude-mon-linux-amd64";
