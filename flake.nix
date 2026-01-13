@@ -167,6 +167,11 @@
           default = nixfleet;
         };
 
+        homeManagerModules = {
+          claude-mon = import ./modules/claude-mon.nix;
+          default = claude-mon;
+        };
+
         devShells.default = pkgs.mkShell {
           buildInputs =
             with pkgs;
