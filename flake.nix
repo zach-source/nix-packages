@@ -87,10 +87,83 @@
           };
         };
 
+        claude-mon = pkgs.stdenv.mkDerivation rec {
+          pname = "claude-mon";
+          version = "0.1.0"; # claude-mon
+
+          src =
+            let
+              selectSystem =
+                if pkgs.stdenv.isDarwin then
+                  if pkgs.stdenv.isAArch64 then
+                    {
+                      url = "https://github.com/zach-source/claude-mon/releases/download/v${version}/claude-mon-darwin-arm64.tar.gz";
+                      sha256 = "0000000000000000000000000000000000000000000000000000000000000000"; # darwin-arm64 # claude-mon
+                      binaryName = "claude-mon-darwin-arm64";
+                    }
+                  else
+                    {
+                      url = "https://github.com/zach-source/claude-mon/releases/download/v${version}/claude-mon-darwin-amd64.tar.gz";
+                      sha256 = "0000000000000000000000000000000000000000000000000000000000000000"; # darwin-amd64 # claude-mon
+                      binaryName = "claude-mon-darwin-amd64";
+                    }
+                else if pkgs.stdenv.isAarch64 then
+                  {
+                    url = "https://github.com/zach-source/claude-mon/releases/download/v${version}/claude-mon-linux-arm64.tar.gz";
+                    sha256 = "0000000000000000000000000000000000000000000000000000000000000000"; # linux-arm64 # claude-mon
+                    binaryName = "claude-mon-linux-arm64";
+                  }
+                else
+                  {
+                    url = "https://github.com/zach-source/claude-mon/releases/download/v${version}/claude-mon-linux-amd64.tar.gz";
+                    sha256 = "0000000000000000000000000000000000000000000000000000000000000000"; # linux-amd64 # claude-mon
+                    binaryName = "claude-mon-linux-amd64";
+                  };
+            in
+            pkgs.fetchurl {
+              inherit (selectSystem) url sha256;
+            };
+
+          binaryName =
+            if pkgs.stdenv.isDarwin then
+              if pkgs.stdenv.isAarch64 then "claude-mon-darwin-arm64" else "claude-mon-darwin-amd64"
+            else if pkgs.stdenv.isAArch64 then
+              "claude-mon-linux-arm64"
+            else
+              "claude-mon-linux-amd64";
+
+          unpackPhase = ''
+            runHook preUnpack
+            mkdir -p source
+            cd source
+            tar -xzf $src
+            runHook postUnpack
+          '';
+
+          installPhase = ''
+            runHook preInstall
+            mkdir -p $out/bin
+            cp ${binaryName} $out/bin/claude-mon
+            chmod +x $out/bin/claude-mon
+            # Create symlink for short name
+            ln -s $out/bin/claude-mon $out/bin/clmon
+            runHook postInstall
+          '';
+
+          meta = with pkgs.lib; {
+            description = "TUI application for watching Claude Code edits in real-time and managing prompts";
+            homepage = "https://github.com/zach-source/claude-mon";
+            license = licenses.mit;
+            maintainers = [ ];
+            platforms = platforms.unix;
+          };
+        };
+
       in
       {
         packages = {
           inherit nixfleet;
+          inherit claude-mon;
           default = nixfleet;
         };
 
