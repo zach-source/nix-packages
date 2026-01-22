@@ -4,6 +4,16 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
+
+    # Steve Yegge's AI coding tools
+    gastown-src = {
+      url = "github:steveyegge/gastown";
+      flake = false;
+    };
+    beads-src = {
+      url = "github:steveyegge/beads";
+      flake = false;
+    };
   };
 
   outputs =
@@ -11,6 +21,8 @@
       self,
       nixpkgs,
       flake-utils,
+      gastown-src,
+      beads-src,
     }:
     flake-utils.lib.eachDefaultSystem (
       system:
@@ -159,11 +171,69 @@
           };
         };
 
+        # Beads - git-backed graph issue tracker for AI coding agents
+        beads = pkgs.buildGoModule {
+          pname = "beads";
+          version = "0.44.0"; # beads
+
+          src = beads-src;
+
+          vendorHash = "sha256-YU+bRLVlWtHzJ1QPzcKJ70f+ynp8lMoIeFlm+29BNPE="; # beads
+
+          subPackages = [ "cmd/bd" ];
+
+          nativeCheckInputs = [ pkgs.git ];
+
+          # Some tests require git worktree features not available in sandbox
+          doCheck = false;
+
+          ldflags = [
+            "-s"
+            "-w"
+            "-X main.version=0.44.0"
+          ];
+
+          meta = with pkgs.lib; {
+            description = "Distributed, git-backed graph issue tracker for AI coding agents";
+            homepage = "https://github.com/steveyegge/beads";
+            license = licenses.asl20;
+            maintainers = [ ];
+            mainProgram = "bd";
+          };
+        };
+
+        # Gastown - multi-agent orchestration system for Claude Code
+        gastown = pkgs.buildGoModule {
+          pname = "gastown";
+          version = "0.1.0"; # gastown
+
+          src = gastown-src;
+
+          vendorHash = "sha256-ripY9vrYgVW8bngAyMLh0LkU/Xx1UUaLgmAA7/EmWQU="; # gastown
+
+          subPackages = [ "cmd/gt" ];
+
+          ldflags = [
+            "-s"
+            "-w"
+          ];
+
+          meta = with pkgs.lib; {
+            description = "Multi-agent orchestration system for Claude Code";
+            homepage = "https://github.com/steveyegge/gastown";
+            license = licenses.asl20;
+            maintainers = [ ];
+            mainProgram = "gt";
+          };
+        };
+
       in
       {
         packages = {
           inherit nixfleet;
           inherit claude-mon;
+          inherit beads;
+          inherit gastown;
           default = nixfleet;
         };
 
@@ -173,17 +243,11 @@
         };
 
         devShells.default = pkgs.mkShell {
-          buildInputs =
-            with pkgs;
-            [
-              go
-              gopls
-              golangci-lint
-            ]
-            ++ lib.optionals stdenv.isDarwin [
-              pkgs.darwin.apple_sdk.frameworks.Security
-              pkgs.darwin.apple_sdk.frameworks.CoreFoundation
-            ];
+          buildInputs = with pkgs; [
+            go
+            gopls
+            golangci-lint
+          ];
 
           shellHook = ''
             echo "Development environment for nix-packages"

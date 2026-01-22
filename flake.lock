@@ -1,5 +1,21 @@
 {
   "nodes": {
+    "beads-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1769064419,
+        "narHash": "sha256-byAIl0sIzLn6ap5fTWZDRtmLh5bwxL9aXcQw3NERXG0=",
+        "owner": "steveyegge",
+        "repo": "beads",
+        "rev": "5264d7aa604d0bbc4107ba18ba4bffdc023820e3",
+        "type": "github"
+      },
+      "original": {
+        "owner": "steveyegge",
+        "repo": "beads",
+        "type": "github"
+      }
+    },
     "flake-utils": {
       "inputs": {
         "systems": "systems"
@@ -15,6 +31,22 @@
       "original": {
         "owner": "numtide",
         "repo": "flake-utils",
+        "type": "github"
+      }
+    },
+    "gastown-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1769065664,
+        "narHash": "sha256-J9bGYr0UJoAikyb9xCR4IbcK+hNAYgY5A3y2iB1R02E=",
+        "owner": "steveyegge",
+        "repo": "gastown",
+        "rev": "b158ff27c25efa02ad2a6948a923186a99c6a429",
+        "type": "github"
+      },
+      "original": {
+        "owner": "steveyegge",
+        "repo": "gastown",
         "type": "github"
       }
     },
@@ -36,7 +68,9 @@
     },
     "root": {
       "inputs": {
+        "beads-src": "beads-src",
         "flake-utils": "flake-utils",
+        "gastown-src": "gastown-src",
         "nixpkgs": "nixpkgs"
       }
     },
