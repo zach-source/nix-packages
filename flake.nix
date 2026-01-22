@@ -174,7 +174,7 @@
         # Beads - git-backed graph issue tracker for AI coding agents
         beads = pkgs.buildGoModule {
           pname = "beads";
-          version = "0.44.0"; # beads
+          version = "0.47.1"; # beads
 
           src = beads-src;
 
@@ -190,7 +190,7 @@
           ldflags = [
             "-s"
             "-w"
-            "-X main.version=0.44.0"
+            "-X main.version=0.47.1"
           ];
 
           meta = with pkgs.lib; {
@@ -205,7 +205,7 @@
         # Gastown - multi-agent orchestration system for Claude Code
         gastown = pkgs.buildGoModule {
           pname = "gastown";
-          version = "0.1.0"; # gastown
+          version = "0.5.0"; # gastown
 
           src = gastown-src;
 
