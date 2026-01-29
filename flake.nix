@@ -227,6 +227,77 @@
           };
         };
 
+        # Microforge - Claude Code agent orchestration for microservices
+        mforge = pkgs.stdenv.mkDerivation rec {
+          pname = "mforge";
+          version = "0.1.0"; # mforge
+
+          src =
+            let
+              selectSystem =
+                if pkgs.stdenv.isDarwin then
+                  if pkgs.stdenv.isAarch64 then
+                    {
+                      url = "https://github.com/zach-source/microforge/releases/download/v${version}/mforge-darwin-arm64.tar.gz";
+                      sha256 = "0000000000000000000000000000000000000000000000000000000000000000"; # darwin-arm64 # mforge
+                      binaryName = "mforge-darwin-arm64";
+                    }
+                  else
+                    {
+                      url = "https://github.com/zach-source/microforge/releases/download/v${version}/mforge-darwin-amd64.tar.gz";
+                      sha256 = "0000000000000000000000000000000000000000000000000000000000000000"; # darwin-amd64 # mforge
+                      binaryName = "mforge-darwin-amd64";
+                    }
+                else if pkgs.stdenv.isAarch64 then
+                  {
+                    url = "https://github.com/zach-source/microforge/releases/download/v${version}/mforge-linux-arm64.tar.gz";
+                    sha256 = "0000000000000000000000000000000000000000000000000000000000000000"; # linux-arm64 # mforge
+                    binaryName = "mforge-linux-arm64";
+                  }
+                else
+                  {
+                    url = "https://github.com/zach-source/microforge/releases/download/v${version}/mforge-linux-amd64.tar.gz";
+                    sha256 = "0000000000000000000000000000000000000000000000000000000000000000"; # linux-amd64 # mforge
+                    binaryName = "mforge-linux-amd64";
+                  };
+            in
+            pkgs.fetchurl {
+              inherit (selectSystem) url sha256;
+            };
+
+          binaryName =
+            if pkgs.stdenv.isDarwin then
+              if pkgs.stdenv.isAarch64 then "mforge-darwin-arm64" else "mforge-darwin-amd64"
+            else if pkgs.stdenv.isAarch64 then
+              "mforge-linux-arm64"
+            else
+              "mforge-linux-amd64";
+
+          unpackPhase = ''
+            runHook preUnpack
+            mkdir -p source
+            cd source
+            tar -xzf $src
+            runHook postUnpack
+          '';
+
+          installPhase = ''
+            runHook preInstall
+            mkdir -p $out/bin
+            cp ${binaryName} $out/bin/mforge
+            chmod +x $out/bin/mforge
+            runHook postInstall
+          '';
+
+          meta = with pkgs.lib; {
+            description = "CLI that orchestrates Claude Code agents as a multi-role system for microservices";
+            homepage = "https://github.com/zach-source/microforge";
+            license = licenses.mit;
+            maintainers = [ ];
+            platforms = platforms.unix;
+          };
+        };
+
       in
       {
         packages = {
@@ -234,6 +305,7 @@
           inherit claude-mon;
           inherit beads;
           inherit gastown;
+          inherit mforge;
           default = nixfleet;
         };
 

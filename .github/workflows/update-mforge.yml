@@ -1,0 +1,64 @@
+name: Update mforge Package
+
+on:
+  repository_dispatch:
+    types: [mforge-release]
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    name: Update Package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Update flake.nix
+        id: update
+        run: |
+          VERSION="${{ github.event.client_payload.version }}"
+          DARWIN_ARM64="${{ github.event.client_payload.darwin_arm64_sha256 }}"
+          DARWIN_AMD64="${{ github.event.client_payload.darwin_amd64_sha256 }}"
+          LINUX_ARM64="${{ github.event.client_payload.linux_arm64_sha256 }}"
+          LINUX_AMD64="${{ github.event.client_payload.linux_amd64_sha256 }}"
+
+          echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
+
+          # Update version - flexible whitespace matching
+          sed -i 's/version = "[0-9.]*"; *# mforge$/version = "'"${VERSION}"'"; # mforge/' flake.nix
+
+          # Update SHA256 hashes - flexible whitespace matching with proper escaping
+          sed -i 's/sha256 = "[a-f0-9]*"; *# darwin-arm64 # mforge$/sha256 = "'"${DARWIN_ARM64}"'"; # darwin-arm64 # mforge/' flake.nix
+          sed -i 's/sha256 = "[a-f0-9]*"; *# darwin-amd64 # mforge$/sha256 = "'"${DARWIN_AMD64}"'"; # darwin-amd64 # mforge/' flake.nix
+          sed -i 's/sha256 = "[a-f0-9]*"; *# linux-arm64 # mforge$/sha256 = "'"${LINUX_ARM64}"'"; # linux-arm64 # mforge/' flake.nix
+          sed -i 's/sha256 = "[a-f0-9]*"; *# linux-amd64 # mforge$/sha256 = "'"${LINUX_AMD64}"'"; # linux-amd64 # mforge/' flake.nix
+
+          # Show changes for debugging
+          git diff flake.nix || echo "No changes detected"
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v27
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+
+      - name: Build and test mforge
+        run: |
+          nix build .#mforge
+          ./result/bin/mforge --version
+          echo "Build and version check passed"
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add flake.nix
+          git commit -m "Update mforge to v${{ steps.update.outputs.VERSION }}"
+          git push
+
+      - name: Create version tag
+        run: |
+          VERSION="mforge-v${{ steps.update.outputs.VERSION }}"
+          git tag -a "${VERSION}" -m "mforge ${VERSION}"
+          git push origin "${VERSION}"
