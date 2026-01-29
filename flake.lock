@@ -50,6 +50,22 @@
         "type": "github"
       }
     },
+    "microforge-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1769660907,
+        "narHash": "sha256-dmJAjro2zbLUdI2YpXFW6JFg/AJ12/sKGa8/11wUT8s=",
+        "owner": "zach-source",
+        "repo": "microforge",
+        "rev": "6a2b9d47e9b2629c20eb92dd02ab90694f0a370e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "zach-source",
+        "repo": "microforge",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1757967192,
@@ -71,6 +87,7 @@
         "beads-src": "beads-src",
         "flake-utils": "flake-utils",
         "gastown-src": "gastown-src",
+        "microforge-src": "microforge-src",
         "nixpkgs": "nixpkgs"
       }
     },
