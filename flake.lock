@@ -3,11 +3,11 @@
     "beads-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1780694014,
-        "narHash": "sha256-GY01T/NBOMW5a9QBbE2ADck1VBFly3LQ7Y5SiQ/qB1I=",
+        "lastModified": 1780854438,
+        "narHash": "sha256-2yGHhmioIN3m7pqX0gg+L/UbcObe0awmlGlw73rjiwg=",
         "owner": "steveyegge",
         "repo": "beads",
-        "rev": "0da7f51f3bcb6ae350f836f616d8c7244c2868d0",
+        "rev": "d12106162c30b5c973f498c0ba33bb801477245e",
         "type": "github"
       },
       "original": {
