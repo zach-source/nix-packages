@@ -3,11 +3,11 @@
     "beads-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1769064419,
-        "narHash": "sha256-byAIl0sIzLn6ap5fTWZDRtmLh5bwxL9aXcQw3NERXG0=",
+        "lastModified": 1780694014,
+        "narHash": "sha256-GY01T/NBOMW5a9QBbE2ADck1VBFly3LQ7Y5SiQ/qB1I=",
         "owner": "steveyegge",
         "repo": "beads",
-        "rev": "5264d7aa604d0bbc4107ba18ba4bffdc023820e3",
+        "rev": "0da7f51f3bcb6ae350f836f616d8c7244c2868d0",
         "type": "github"
       },
       "original": {
@@ -68,11 +68,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1757967192,
-        "narHash": "sha256-/aA9A/OBmnuOMgwfzdsXRusqzUpd8rQnQY8jtrHK+To=",
+        "lastModified": 1780747962,
+        "narHash": "sha256-IX7G1dlKrOqPOImfbo7ADDfV5yU1+j+MRChI3TL4tAA=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "0d7c15863b251a7a50265e57c1dca1a7add2e291",
+        "rev": "cbb5cf358f50aa6acc9efd6113b7bcfbc352cd73",
         "type": "github"
       },
       "original": {

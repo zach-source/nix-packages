@@ -177,17 +177,20 @@
         };
 
         # Beads - git-backed graph issue tracker for AI coding agents
-        beads = pkgs.buildGoModule {
+        beads = (pkgs.buildGoModule.override { go = pkgs.go_1_26; }) {
           pname = "beads";
-          version = "0.47.1"; # beads
+          version = "1.0.5"; # beads
 
           src = beads-src;
 
-          vendorHash = "sha256-YU+bRLVlWtHzJ1QPzcKJ70f+ynp8lMoIeFlm+29BNPE="; # beads
+          vendorHash = "sha256-7x8ZOWWM5S2Bvqv1SDZZw3w+fvZJldkzddcXZ0DehZU="; # beads
 
           subPackages = [ "cmd/bd" ];
 
           nativeCheckInputs = [ pkgs.git ];
+
+          # CGO requires ICU headers (go-icu-regex); use server mode (no-CGO) instead
+          env.CGO_ENABLED = "0";
 
           # Some tests require git worktree features not available in sandbox
           doCheck = false;
@@ -195,7 +198,7 @@
           ldflags = [
             "-s"
             "-w"
-            "-X main.version=0.47.1"
+            "-X main.version=1.0.5"
           ];
 
           meta = with pkgs.lib; {
