@@ -189,8 +189,9 @@
 
           nativeCheckInputs = [ pkgs.git ];
 
-          # CGO requires ICU headers (go-icu-regex); use server mode (no-CGO) instead
-          env.CGO_ENABLED = "0";
+          # gms_pure_go: use pure-Go mysql-server regex (skips ICU/go-icu-regex CGO dep)
+          # This is beads' standard build tag (Makefile: BUILD_TAGS := gms_pure_go)
+          tags = [ "gms_pure_go" ];
 
           # Some tests require git worktree features not available in sandbox
           doCheck = false;
