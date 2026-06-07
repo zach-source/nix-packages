@@ -268,6 +268,7 @@
           inherit beads;
           inherit gastown;
           inherit mforge;
+          dolt = pkgs.dolt; # Re-export from newer nixpkgs for dotfiles consumers
           default = nixfleet;
         };
 
