@@ -11,7 +11,10 @@
       flake = false;
     };
     beads-src = {
-      url = "github:steveyegge/beads";
+      # Pinned to the release tag: the derivation's version/ldflags below must
+      # match the source, and an unpinned branch URL lets `nix flake update`
+      # silently drift them apart.
+      url = "github:steveyegge/beads/v1.1.2";
       flake = false;
     };
     microforge-src = {
@@ -179,11 +182,11 @@
         # Beads - git-backed graph issue tracker for AI coding agents
         beads = (pkgs.buildGoModule.override { go = pkgs.go_1_26; }) {
           pname = "beads";
-          version = "1.0.5"; # beads
+          version = "1.1.2"; # beads
 
           src = beads-src;
 
-          vendorHash = "sha256-7x8ZOWWM5S2Bvqv1SDZZw3w+fvZJldkzddcXZ0DehZU="; # beads
+          vendorHash = "sha256-WWEwGpCwMPD7jaz02zN745RQQqYTQttehbcT3J9hayM="; # beads
 
           subPackages = [ "cmd/bd" ];
 
@@ -199,7 +202,7 @@
           ldflags = [
             "-s"
             "-w"
-            "-X main.version=1.0.5"
+            "-X main.version=1.1.2"
           ];
 
           meta = with pkgs.lib; {
